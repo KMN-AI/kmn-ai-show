@@ -3,162 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>美团点餐页面</title>
+    <title>密码输入页面</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
-        }
-        header {
-            background-color: #ffca28;
-            color: #333;
-            text-align: center;
-            padding: 10px 0;
-            font-size: 24px;
-            font-weight: bold;
+            background-color: #f4f4f4;
         }
         .container {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 10px;
-        }
-        .menu-item {
+            width: 100%;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
             background-color: #fff;
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            flex: 1 0 30%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-size: 16px;
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-group input:focus {
+            border-color: #ff9800;
+        }
+        .error-message {
+            color: red;
+            font-size: 14px;
             text-align: center;
         }
-        .menu-item img {
+        .submit-btn {
             width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
-        .menu-item h3 {
-            margin: 10px 0 5px;
-        }
-        .menu-item p {
-            margin: 5px 0;
-            color: #888;
-        }
-        .menu-item button {
-            background-color: #ff9800;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .menu-item button:hover {
-            background-color: #fb8c00;
-        }
-        .cart {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #fff;
-            border-top: 1px solid #ddd;
             padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-        }
-        .cart span {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .cart button {
             background-color: #4caf50;
-            color: #fff;
+            color: white;
             border: none;
-            padding: 10px 20px;
+            font-size: 16px;
             cursor: pointer;
             border-radius: 5px;
         }
-        .cart button:hover {
-            background-color: #43a047;
+        .submit-btn:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <header>美团点餐页面</header>
-    <div class="container" id="menu">
-        <!-- 菜品列表，动态生成 -->
-    </div>
-    <div class="cart">
-        <span>总价：¥<span id="totalPrice">0.00</span></span>
-        <button onclick="checkout()">结算</button>
+
+    <div class="container">
+        <h2>输入密码</h2>
+        <form id="passwordForm">
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required>
+                <div id="error-message" class="error-message"></div>
+            </div>
+            <button type="submit" class="submit-btn">提交</button>
+        </form>
     </div>
 
     <script>
-        // 菜品数据
-        const menuData = [
-            { id: 1, name: "宫保鸡丁", price: 18.0, image: "https://via.placeholder.com/150" },
-            { id: 2, name: "红烧牛肉面", price: 25.0, image: "https://via.placeholder.com/150" },
-            { id: 3, name: "麻婆豆腐", price: 15.0, image: "https://via.placeholder.com/150" },
-            { id: 4, name: "香酥炸鸡", price: 30.0, image: "https://via.placeholder.com/150" },
-            { id: 5, name: "鱼香茄子", price: 20.0, image: "https://via.placeholder.com/150" },
-            { id: 6, name: "清炒时蔬", price: 12.0, image: "https://via.placeholder.com/150" },
-        ];
+        document.getElementById("passwordForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            const password = document.getElementById("password").value;
+            const errorMessage = document.getElementById("error-message");
 
-        const cart = []; // 购物车数组
-
-        // 渲染菜品
-        function renderMenu() {
-            const menuContainer = document.getElementById("menu");
-            menuData.forEach(item => {
-                const menuItem = document.createElement("div");
-                menuItem.className = "menu-item";
-                menuItem.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}">
-                    <h3>${item.name}</h3>
-                    <p>¥${item.price.toFixed(2)}</p>
-                    <button onclick="addToCart(${item.id})">加入购物车</button>
-                `;
-                menuContainer.appendChild(menuItem);
-            });
-        }
-
-        // 添加菜品到购物车
-        function addToCart(itemId) {
-            const selectedItem = menuData.find(item => item.id === itemId);
-            cart.push(selectedItem);
-            updateTotalPrice();
-        }
-
-        // 更新总价
-        function updateTotalPrice() {
-            const totalPrice = cart.reduce((total, item) => total + item.price, 0);
-            document.getElementById("totalPrice").innerText = totalPrice.toFixed(2);
-        }
-
-        // 结算
-        function checkout() {
-            if (cart.length === 0) {
-                alert("您的购物车是空的，请添加菜品！");
-                return;
+            // 密码验证，至少一个大写字母，一个小写字母
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
+            if (!passwordRegex.test(password)) {
+                errorMessage.textContent = "密码必须包含至少一个大写字母、一个小写字母，并且长度至少为 6 个字符。";
+            } else {
+                errorMessage.textContent = "";
+                alert("密码提交成功！");
             }
-            let cartSummary = "您选购的菜品如下：\n";
-            const cartItems = {};
-            cart.forEach(item => {
-                cartItems[item.name] = (cartItems[item.name] || 0) + 1;
-            });
-            for (const [name, count] of Object.entries(cartItems)) {
-                cartSummary += `${name} x${count}\n`;
-            }
-            cartSummary += `总价：¥${document.getElementById("totalPrice").innerText}`;
-            alert(cartSummary);
-        }
-
-        // 页面加载时渲染菜单
-        window.onload = renderMenu;
+        });
     </script>
+
 </body>
 </html>

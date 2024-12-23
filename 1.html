@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>中国人口地图</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts-gl.min.js"></script>
     <style>
         #map {
             width: 100%;
@@ -26,49 +27,63 @@
             "新疆": 24.87
         };
 
+        // 获取地图容器
         var myChart = echarts.init(document.getElementById('map'));
 
-        var option = {
-            title: {
-                text: '中国各省人口分布图',
-                left: 'center'
-            },
-            tooltip: {
-                trigger: 'item',
-                formatter: function (params) {
-                    var population = populationData[params.name] || 0;
-                    return params.name + '：' + population + '百万';
-                }
-            },
-            visualMap: {
-                min: 0,
-                max: 130,
-                left: 'left',
-                top: 'bottom',
-                text: ['高', '低'],
-                calculable: true,
-                inRange: {
-                    color: ['#f9c8b2', '#e74c3c']  // 从浅到深的红色系
-                }
-            },
-            series: [{
-                name: '人口',
-                type: 'map',
-                mapType: 'china',
-                roam: true,  // 允许缩放和平移
-                label: {
-                    show: true
-                },
-                data: Object.keys(populationData).map(function (province) {
-                    return {
-                        name: province,
-                        value: populationData[province]
-                    };
-                })
-            }]
-        };
+        // 动态加载中国地图
+        fetch('https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/asset/map/json/china.json')
+            .then(response => response.json())
+            .then(geoJson => {
+                // 注册中国地图
+                echarts.registerMap('china', geoJson);
 
-        myChart.setOption(option);
+                // 配置项
+                var option = {
+                    title: {
+                        text: '中国各省人口分布图',
+                        left: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: function (params) {
+                            var population = populationData[params.name] || 0;
+                            return params.name + '：' + population + '百万';
+                        }
+                    },
+                    visualMap: {
+                        min: 0,
+                        max: 130,
+                        left: 'left',
+                        top: 'bottom',
+                        text: ['高', '低'],
+                        calculable: true,
+                        inRange: {
+                            color: ['#f9c8b2', '#e74c3c']  // 从浅到深的红色系
+                        }
+                    },
+                    series: [{
+                        name: '人口',
+                        type: 'map',
+                        mapType: 'china',
+                        roam: true,  // 允许缩放和平移
+                        label: {
+                            show: true
+                        },
+                        data: Object.keys(populationData).map(function (province) {
+                            return {
+                                name: province,
+                                value: populationData[province]
+                            };
+                        })
+                    }]
+                };
+
+                // 设置配置项
+                myChart.setOption(option);
+            })
+            .catch(error => {
+                console.error("加载地图数据失败:", error);
+            });
     </script>
 </body>
 </html>

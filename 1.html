@@ -3,71 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Line Chart</title>
+    <title>中国人口地图</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
     <style>
-        #chart {
+        #map {
             width: 100%;
-            height: 400px;
+            height: 600px;
         }
     </style>
 </head>
 <body>
-    <div id="chart"></div>
+    <div id="map"></div>
     <script>
-        var myChart = echarts.init(document.getElementById('chart'));
+        // 模拟的中国各省人口数据 (单位：百万)
+        var populationData = {
+            "北京市": 21.89, "天津市": 15.62, "河北省": 75.99, "山西省": 37.33, "内蒙古": 25.32,
+            "辽宁省": 43.77, "吉林省": 27.05, "黑龙江省": 38.31, "上海市": 24.87, "江苏省": 80.57,
+            "浙江省": 57.37, "安徽省": 63.83, "福建省": 39.04, "江西省": 46.75, "山东省": 100.47,
+            "河南省": 96.99, "湖北省": 59.17, "湖南省": 67.97, "广东省": 126.01, "广西": 50.46,
+            "海南省": 9.34, "重庆市": 31.02, "四川省": 83.02, "贵州省": 38.57, "云南省": 48.30,
+            "西藏": 3.51, "陕西省": 38.76, "甘肃省": 26.03, "青海省": 6.10, "宁夏": 6.90,
+            "新疆": 24.87
+        };
 
-        var xAxisData = [];
-        var yAxisData = [];
+        var myChart = echarts.init(document.getElementById('map'));
 
-        // Initial chart options
         var option = {
             title: {
-                text: 'Real-Time Data Monitoring',
+                text: '中国各省人口分布图',
                 left: 'center'
             },
             tooltip: {
-                trigger: 'axis'
+                trigger: 'item',
+                formatter: function (params) {
+                    var population = populationData[params.name] || 0;
+                    return params.name + '：' + population + '百万';
+                }
             },
-            xAxis: {
-                type: 'category',
-                data: xAxisData
-            },
-            yAxis: {
-                type: 'value'
+            visualMap: {
+                min: 0,
+                max: 130,
+                left: 'left',
+                top: 'bottom',
+                text: ['高', '低'],
+                calculable: true,
+                inRange: {
+                    color: ['#f9c8b2', '#e74c3c']  // 从浅到深的红色系
+                }
             },
             series: [{
-                data: yAxisData,
-                type: 'line',
-                smooth: true
+                name: '人口',
+                type: 'map',
+                mapType: 'china',
+                roam: true,  // 允许缩放和平移
+                label: {
+                    show: true
+                },
+                data: Object.keys(populationData).map(function (province) {
+                    return {
+                        name: province,
+                        value: populationData[province]
+                    };
+                })
             }]
         };
+
         myChart.setOption(option);
-
-        // Simulate real-time data update
-        setInterval(function () {
-            var now = new Date();
-            var xValue = now.toLocaleTimeString();
-            var yValue = Math.floor(Math.random() * 100);
-
-            // Push new data to chart
-            if (xAxisData.length >= 20) {
-                xAxisData.shift();
-                yAxisData.shift();
-            }
-            xAxisData.push(xValue);
-            yAxisData.push(yValue);
-
-            // Update chart with new data
-            myChart.setOption({
-                xAxis: {
-                    data: xAxisData
-                },
-                series: [{
-                    data: yAxisData
-                }]
-            });
-        }, 1000);
     </script>
 </body>
 </html>

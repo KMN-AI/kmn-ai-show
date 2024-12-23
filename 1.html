@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Line Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+    <style>
+        #chart {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chart"></div>
+    <script>
+        var myChart = echarts.init(document.getElementById('chart'));
+
+        var xAxisData = [];
+        var yAxisData = [];
+
+        // Initial chart options
+        var option = {
+            title: {
+                text: 'Real-Time Data Monitoring',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            xAxis: {
+                type: 'category',
+                data: xAxisData
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: yAxisData,
+                type: 'line',
+                smooth: true
+            }]
+        };
+        myChart.setOption(option);
+
+        // Simulate real-time data update
+        setInterval(function () {
+            var now = new Date();
+            var xValue = now.toLocaleTimeString();
+            var yValue = Math.floor(Math.random() * 100);
+
+            // Push new data to chart
+            if (xAxisData.length >= 20) {
+                xAxisData.shift();
+                yAxisData.shift();
+            }
+            xAxisData.push(xValue);
+            yAxisData.push(yValue);
+
+            // Update chart with new data
+            myChart.setOption({
+                xAxis: {
+                    data: xAxisData
+                },
+                series: [{
+                    data: yAxisData
+                }]
+            });
+        }, 1000);
+    </script>
+</body>
+</html>
